@@ -8,6 +8,7 @@ const socket = io(serverUrl);
 function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [recipientId, setRecipientId] = useState(""); // New state for recipient ID
 
   useEffect(() => {
     // Listen for incoming messages from the server
@@ -22,9 +23,9 @@ function ChatPage() {
   }, []);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() !== "") {
-      // Emit the new message to the server
-      socket.emit("message", { content: newMessage });
+    if (newMessage.trim() !== "" && recipientId.trim() !== "") {
+      // Emit the new message to the server with recipient ID
+      socket.emit("message", { content: newMessage, recipientId });
 
       // Clear the input field
       setNewMessage("");
@@ -47,6 +48,12 @@ function ChatPage() {
           className="w-full h-16 resize-none rounded-lg border-2 border-gray-300 p-2"
           placeholder="Type your message..."
         ></textarea>
+        <input
+          value={recipientId}
+          onChange={(e) => setRecipientId(e.target.value)}
+          className="mt-2 px-4 py-2 rounded-lg border-2 border-gray-300 p-2"
+          placeholder="Recipient ID"
+        />
         <button
           onClick={handleSendMessage}
           className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
