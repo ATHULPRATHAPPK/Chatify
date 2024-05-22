@@ -1,33 +1,44 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 
 const serverUrl = "http://localhost:9000";
-const socket = io(serverUrl); 
+const socket = io(serverUrl, { transports: ['websocket'] });
 
 function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [recipientId, setRecipientId] = useState(""); // New state for recipient ID
+  const [recipientId, setRecipientId] = useState("");
 
   useEffect(() => {
-    // Listen for incoming messages from the server
+    console.log("Connecting to socket...");
+    socket.on("connect", () => {
+      console.log("Connected to socket", socket.id);
+    });
+
     socket.on("message", (message) => {
+      console.log("Message received from server:", message);
       setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from socket");
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Connection error:", error);
     });
 
     // Clean up socket connection when component unmounts
     return () => {
+      console.log("Disconnecting from socket...");
       socket.disconnect();
     };
   }, []);
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== "" && recipientId.trim() !== "") {
-      // Emit the new message to the server with recipient ID
+      console.log("Sending message:", newMessage, "to recipient:", recipientId);
       socket.emit("message", { content: newMessage, recipientId });
-
-      // Clear the input field
       setNewMessage("");
     }
   };
@@ -66,5 +77,3 @@ function ChatPage() {
 }
 
 export default ChatPage;
-///
-//
