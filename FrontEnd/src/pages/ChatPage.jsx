@@ -1,33 +1,27 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
+import io from 'socket.io-client';
 
-const serverUrl = "http://localhost:9000";
-const socket = io(serverUrl); 
+const socket = io.connect('http://localhost:3001');
 
 function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [recipientId, setRecipientId] = useState(""); // New state for recipient ID
+  const [recipientId, setRecipientId] = useState("");
 
   useEffect(() => {
-    // Listen for incoming messages from the server
-    socket.on("message", (message) => {
+    socket.on('receive_message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    // Clean up socket connection when component unmounts
     return () => {
-      socket.disconnect();
+      socket.off('receive_message');
     };
-  }, []);
+  }, [])
 
   const handleSendMessage = () => {
-    if (newMessage.trim() !== "" && recipientId.trim() !== "") {
-      // Emit the new message to the server with recipient ID
-      socket.emit("message", { content: newMessage, recipientId });
-
-      // Clear the input field
+    if (newMessage.trim() && recipientId.trim()) {
+      socket.emit('send_message', { recipientId, content: newMessage });
+      setMessages((prevMessages) => [...prevMessages, { content: newMessage, senderId: 'You' }]);
       setNewMessage("");
     }
   };
@@ -37,7 +31,7 @@ function ChatPage() {
       <div className="flex-1 overflow-y-auto bg-gray-200 p-4">
         {messages.map((message, index) => (
           <div key={index} className="my-2 p-2 rounded-lg bg-blue-500 text-white">
-            <span>{message.content}</span>
+            <span>{message.senderId}: {message.content}</span>
           </div>
         ))}
       </div>
@@ -66,5 +60,3 @@ function ChatPage() {
 }
 
 export default ChatPage;
-///
-//

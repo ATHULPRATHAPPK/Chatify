@@ -1,36 +1,32 @@
-const express = require("express");
-const http = require("http");
-
-const cors = require("cors")
+const express = require('express');
 const app = express();
-const port = 9000;
-
-const { Server } = require("socket.io");
+const http = require('http');
+const { Server } = require('socket.io');
 const server = http.createServer(app);
+
+const cors = require('cors');
+app.use(cors());
+
 const io = new Server(server, {
-    cors: {
-        origin: "https://localhost:5174",
-        methods: ["GET", "POST"],
-        credentials: true
-    }
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ["GET", "POST"]
+  }
 });
-app.use(cors(
-    {
-        origin: "https://localhost:5174",
-        methods: ["GET", "POST"],
-        credentials: true
-    }
-))
 
 io.on("connection", (socket) => {
-    console.log("user connected");
-    console.log("id", socket.id);
-    console.log("user connected");
-    console.log("id", socket.id);
+  console.log('user Connected', socket.id);
 
+  socket.on('send_message', (data) => {
+    const { recipientId, content } = data;
+    socket.to(recipientId).emit('receive_message', { content, senderId: socket.id });
+  });
 
+  socket.on('disconnect', () => {
+    console.log('user Disconnected', socket.id);
+  });
 });
 
-server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+server.listen(3001, () => {
+  console.log("server is running on port 3001");
 });
