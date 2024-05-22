@@ -19,7 +19,7 @@ io.on("connection", (socket) => {
 
   socket.on('send_message', (data) => {
     const { recipientId, content } = data;
-    socket.to(recipientId).emit('receive_message', { content, senderId: socket.id });
+    socket.broadcast.emit('receive_message', { content, senderId:'User' });
   });
 
   socket.on('disconnect', () => {
