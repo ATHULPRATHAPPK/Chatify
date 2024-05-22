@@ -1,62 +1,84 @@
 import React, { useState, useEffect } from "react";
 import io from 'socket.io-client';
+import UserList from './UserList';
+import ChatWindow from './ChatWindow';
 
 const socket = io.connect('http://localhost:3001');
 
+const mockUsers = [
+  { id: 'User1', name: 'Robin Sparkles' },
+  { id: 'User2', name: 'Cook Pu' },
+  { id: 'User3', name: 'Princess Consuela' },
+  { id: 'User4', name: 'Bamito Supreme' },
+  { id: 'User5', name: 'The Commodore' },
+  { id: 'User6', name: 'Lorenzo von Matterhorn' },
+];
+
+const mockMessages = {
+  'User1': [
+    { content: "Hello!", senderId: "User1" },
+    { content: "Hi there!", senderId: "You" },
+  ],
+  'User2': [
+    { content: "What's up?", senderId: "User2" },
+    { content: "Not much, you?", senderId: "You" },
+  ],
+  'User3': [
+    { content: "Long time no see!", senderId: "User3" },
+    { content: "Yeah, it's been a while!", senderId: "You" },
+  ],
+  'User4': [
+    { content: "How's it going?", senderId: "User4" },
+    { content: "Pretty good, you?", senderId: "You" },
+  ],
+  'User5': [
+    { content: "Hey!", senderId: "User5" },
+    { content: "Hey!", senderId: "You" },
+  ],
+  'User6': [
+    { content: "Hello there!", senderId: "User6" },
+    { content: "General Kenobi!", senderId: "You" },
+  ]
+};
+
 function ChatPage() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(mockMessages['User1']);
   const [newMessage, setNewMessage] = useState("");
-  const [recipientId, setRecipientId] = useState("");
+  const [selectedUser, setSelectedUser] = useState(mockUsers[0]);
 
   useEffect(() => {
     socket.on('receive_message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-
     });
 
     return () => {
       socket.off('receive_message');
     };
-  }, [socket])
+  }, []);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() && recipientId.trim()) {
-      socket.emit('send_message', { recipientId, content: newMessage });
+    if (newMessage.trim() && selectedUser.id.trim()) {
+      socket.emit('send_message', { recipientId: selectedUser.id, content: newMessage });
       setMessages((prevMessages) => [...prevMessages, { content: newMessage, senderId: 'You' }]);
       setNewMessage("");
     }
   };
 
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+    setMessages(mockMessages[user.id]);
+  };
+
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-1 overflow-y-auto bg-gray-200 p-4">
-        {messages.map((message, index) => (
-          <div key={index}
-          className={`my-2 p-2 rounded-lg text-white ${message.senderId === 'You' ? 'bg-blue-500' : 'bg-green-500'}`}>
-            <span>{message.senderId}: {message.content}</span>
-          </div>
-        ))}
-      </div>
-      <div className="p-4">
-        <textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="w-full h-16 resize-none rounded-lg border-2 border-gray-300 p-2"
-          placeholder="Type your message..."
-        ></textarea>
-        <input
-          value={recipientId}
-          onChange={(e) => setRecipientId(e.target.value)}
-          className="mt-2 px-4 py-2 rounded-lg border-2 border-gray-300 p-2"
-          placeholder="Recipient ID"
-        />
-        <button
-          onClick={handleSendMessage}
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-        >
-          Send
-        </button>
-      </div>
+    <div className="flex h-screen bg-gray-900 text-white">
+      <UserList users={mockUsers} selectedUser={selectedUser} setSelectedUser={handleUserSelect} />
+      <ChatWindow 
+        messages={messages} 
+        newMessage={newMessage} 
+        setNewMessage={setNewMessage} 
+        handleSendMessage={handleSendMessage}
+        selectedUser={selectedUser}
+      />
     </div>
   );
 }
