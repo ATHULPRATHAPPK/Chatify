@@ -11,12 +11,13 @@ function ChatPage() {
   useEffect(() => {
     socket.on('receive_message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
+
     });
 
     return () => {
       socket.off('receive_message');
     };
-  }, [])
+  }, [socket])
 
   const handleSendMessage = () => {
     if (newMessage.trim() && recipientId.trim()) {
@@ -30,7 +31,8 @@ function ChatPage() {
     <div className="flex flex-col h-screen">
       <div className="flex-1 overflow-y-auto bg-gray-200 p-4">
         {messages.map((message, index) => (
-          <div key={index} className="my-2 p-2 rounded-lg bg-blue-500 text-white">
+          <div key={index}
+          className={`my-2 p-2 rounded-lg text-white ${message.senderId === 'You' ? 'bg-blue-500' : 'bg-green-500'}`}>
             <span>{message.senderId}: {message.content}</span>
           </div>
         ))}
