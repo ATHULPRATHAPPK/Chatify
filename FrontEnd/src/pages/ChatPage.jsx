@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
+import io from 'socket.io-client';
 
-const serverUrl = "http://localhost:9000";
-const socket = io(serverUrl, { transports: ['websocket'] });
+const socket = io.connect('http://localhost:3001');
 
 function ChatPage() {
   const [messages, setMessages] = useState([]);
@@ -10,35 +9,19 @@ function ChatPage() {
   const [recipientId, setRecipientId] = useState("");
 
   useEffect(() => {
-    console.log("Connecting to socket...");
-    socket.on("connect", () => {
-      console.log("Connected to socket", socket.id);
-    });
-
-    socket.on("message", (message) => {
-      console.log("Message received from server:", message);
+    socket.on('receive_message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from socket");
-    });
-
-    socket.on("connect_error", (error) => {
-      console.error("Connection error:", error);
-    });
-
-    // Clean up socket connection when component unmounts
     return () => {
-      console.log("Disconnecting from socket...");
-      socket.disconnect();
+      socket.off('receive_message');
     };
-  }, []);
+  }, [])
 
   const handleSendMessage = () => {
-    if (newMessage.trim() !== "" && recipientId.trim() !== "") {
-      console.log("Sending message:", newMessage, "to recipient:", recipientId);
-      socket.emit("message", { content: newMessage, recipientId });
+    if (newMessage.trim() && recipientId.trim()) {
+      socket.emit('send_message', { recipientId, content: newMessage });
+      setMessages((prevMessages) => [...prevMessages, { content: newMessage, senderId: 'You' }]);
       setNewMessage("");
     }
   };
@@ -48,7 +31,7 @@ function ChatPage() {
       <div className="flex-1 overflow-y-auto bg-gray-200 p-4">
         {messages.map((message, index) => (
           <div key={index} className="my-2 p-2 rounded-lg bg-blue-500 text-white">
-            <span>{message.content}</span>
+            <span>{message.senderId}: {message.content}</span>
           </div>
         ))}
       </div>

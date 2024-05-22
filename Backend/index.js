@@ -1,60 +1,32 @@
-const express = require("express");
-const http = require("http");
-const cors = require("cors");
+const express = require('express');
 const app = express();
-const port = 9000;
+const http = require('http');
+const { Server } = require('socket.io');
+const server = http.createServer(app);
 
-const { Server } = require("socket.io");
+const cors = require('cors');
+app.use(cors());
 
-const wait = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ["GET", "POST"]
+  }
+});
 
-const timerr = async () => {
-    try {
-        await wait(2000);
-        console.log("Waited for 2 seconds");
+io.on("connection", (socket) => {
+  console.log('user Connected', socket.id);
 
-        const server = http.createServer(app);
-        console.log("HTTP server created");
+  socket.on('send_message', (data) => {
+    const { recipientId, content } = data;
+    socket.to(recipientId).emit('receive_message', { content, senderId: socket.id });
+  });
 
-        const io = new Server(server, {
-            cors: {
-                origin: "http://localhost:5173",
-                methods: ["GET", "POST"],
-                credentials: true
-            }
-        });
-        console.log("Socket.io server created");
+  socket.on('disconnect', () => {
+    console.log('user Disconnected', socket.id);
+  });
+});
 
-        io.on("connection", (socket) => {
-            console.log("User connected", socket.id);
-
-            socket.on("message", (data) => {
-                console.log("Message received:", data);
-                io.to(data.recipientId).emit("message", data);
-            });
-
-            socket.join(socket.id);
-
-            socket.on("disconnect", () => {
-                console.log("User disconnected", socket.id);
-            });
-        });
-
-        server.listen(port, () => {
-            console.log(`Server is running on port ${port}`);
-        });
-
-    } catch (error) {
-        console.error("Error in timerr function:", error);
-    }
-};
-
-app.use(cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true
-}));
-
-timerr();
+server.listen(3001, () => {
+  console.log("server is running on port 3001");
+});
