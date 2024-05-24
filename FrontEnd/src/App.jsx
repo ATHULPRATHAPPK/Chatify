@@ -1,15 +1,19 @@
-// eslint-disable-next-line no-unused-vars
 import React from "react";
-import ChatPage from "./pages/ChatPage";
-
-
+import { Routes, Route } from "react-router-dom";
+import ChatPage from "./pages/Chat";
+import LoginPage from "./Components/LoginPage";
 
 function App() {
   return (
-  <>
-    <ChatPage />
-    <div>App</div>
-  </>);
+    <>
+      <div>App</div>
+
+      <Routes>
+        <Route path='/userLogin' element={<LoginPage />} />
+        <Route path='/chat' element={<ChatPage />} />
+      </Routes>
+    </>
+  );
 }
 
 export default App;
