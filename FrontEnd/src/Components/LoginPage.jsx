@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const userURL = 'http://localhost:4000/api/users';
+const userURL = 'http://localhost:3001/api/users';
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
