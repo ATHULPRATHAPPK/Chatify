@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DarkModeToggle from './DarkModeToggle'; // Import the DarkModeToggle component
+import loginGif from '../assets/loginGif.gif'; // Import the GIF
+
 const userURL = 'http://localhost:3001/api/users';
 
 const LoginPage = () => {
@@ -31,7 +33,7 @@ const LoginPage = () => {
         `${userURL}/${isLogin ? 'userlogin' : 'usersignup'}`,
         userData,
         {
-          withCredentials: true
+          withCredentials: true,
         }
       );
       console.log('Data sent successfully:', response);
@@ -48,12 +50,12 @@ const LoginPage = () => {
     <div className={`${darkMode ? 'dark' : ''}`}>
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="absolute top-4 right-4">
-          {/* Replace the FontAwesomeIcon with DarkModeToggle component */}
           <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         </div>
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center dark:text-white">{isLogin ? 'Login' : 'Signup'} Page</h2>
           {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
+          <img src={loginGif} alt="Login Gif" className="bg-cover bg-center  mb-4 mx-auto" /> {/* Added GIF */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             {!isLogin && (
               <div>
