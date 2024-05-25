@@ -1,3 +1,4 @@
+// UserList.jsx
 import React from 'react';
 
 function UserList({ users, selectedUser, setSelectedUser }) {
@@ -11,10 +12,10 @@ function UserList({ users, selectedUser, setSelectedUser }) {
       />
       <h3 className="text-md font-semibold mb-2">Other Users</h3>
       <ul className="flex-1 overflow-y-auto">
-        {users.map((user) => (
+        {users && users.map((user) => (
           <li
-            key={user.id}
-            className={`p-2 cursor-pointer rounded-lg mb-2 ${selectedUser.id === user.id ? 'bg-blue-500' : 'bg-gray-700'} hover:bg-blue-400`}
+            key={user.username}
+            className={`p-2 cursor-pointer rounded-lg mb-2 ${selectedUser?.username === user.username ? 'bg-blue-500' : 'bg-gray-700'} hover:bg-blue-400`}
             onClick={() => setSelectedUser(user)}
           >
             {user.name}

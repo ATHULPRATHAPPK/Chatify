@@ -1,10 +1,11 @@
+// ChatWindow.jsx
 import React from 'react';
 
 function ChatWindow({ messages, newMessage, setNewMessage, handleSendMessage, selectedUser }) {
   return (
     <div className="flex-1 flex flex-col bg-gray-900 p-4">
       <div className="bg-gray-800 p-4 rounded-t-lg">
-        <h2 className="text-lg font-bold">{selectedUser.name}</h2>
+        <h2 className="text-lg font-bold">{selectedUser?.name}</h2>
       </div>
       <div className="flex-1 overflow-y-auto mb-4">
         {messages.map((message, index) => (
