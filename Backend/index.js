@@ -3,7 +3,8 @@ const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const userRoutes = require('./Routes/authRoutes');
+const AuthRouter = require('./Routes/authRoutes');
+const userRouter=require('./Routes/userController')
 
 const app = express();
 const server = http.createServer(app);
@@ -22,7 +23,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use('/api/users', userRoutes);
+app.use('/api/users', AuthRouter);
+app.use('/api/users',userRouter)
 
 const io = new Server(server, {
   cors: {
