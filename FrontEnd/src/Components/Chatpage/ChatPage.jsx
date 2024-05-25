@@ -1,52 +1,50 @@
+// ChatPage.jsx
 import React, { useState, useEffect } from "react";
 import io from 'socket.io-client';
+import axios from 'axios';
 import UserList from './UserList';
 import ChatWindow from './ChatWindow';
 
 const socket = io.connect('http://localhost:3001');
 
-const mockUsers = [
-  { id: 'User1', name: 'Robin Sparkles' },
-  { id: 'User2', name: 'Cook Pu' },
-  { id: 'User3', name: 'Princess Consuela' },
-  { id: 'User4', name: 'Bamito Supreme' },
-  { id: 'User5', name: 'The Commodore' },
-  { id: 'User6', name: 'Lorenzo von Matterhorn' },
-];
-
 const mockMessages = {
-  'User1': [
+  'abhi4598': [
     { content: "Hello!", senderId: "User1" },
     { content: "Hi there!", senderId: "You" },
   ],
-  'User2': [
+  'shibil0671': [
     { content: "What's up?", senderId: "User2" },
     { content: "Not much, you?", senderId: "You" },
   ],
-  'User3': [
+  'athul5612': [
     { content: "Long time no see!", senderId: "User3" },
     { content: "Yeah, it's been a while!", senderId: "You" },
   ],
-  'User4': [
+  'anwar9090': [
     { content: "How's it going?", senderId: "User4" },
     { content: "Pretty good, you?", senderId: "You" },
-  ],
-  'User5': [
-    { content: "Hey!", senderId: "User5" },
-    { content: "Hey!", senderId: "You" },
-  ],
-  'User6': [
-    { content: "Hello there!", senderId: "User6" },
-    { content: "General Kenobi!", senderId: "You" },
   ]
 };
 
 function ChatPage() {
-  const [messages, setMessages] = useState(mockMessages['User1']);
+  const [messages, setMessages] = useState(mockMessages['abhi4598']);
   const [newMessage, setNewMessage] = useState("");
-  const [selectedUser, setSelectedUser] = useState(mockUsers[0]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [mockUsers, setMockUsers] = useState([]);
 
   useEffect(() => {
+    axios.post('http://localhost:3001/api/users/listUsers')
+      .then(response => {
+        setMockUsers(response.data);
+        if (response.data.length > 0) {
+          setSelectedUser(response.data[0]);
+          setMessages(mockMessages[response.data[0].username] || []);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+
     socket.on('receive_message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
@@ -57,7 +55,7 @@ function ChatPage() {
   }, []);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() && selectedUser.id.trim()) {
+    if (newMessage.trim() && selectedUser?.id?.trim()) {
       socket.emit('send_message', { recipientId: selectedUser.id, content: newMessage });
       setMessages((prevMessages) => [...prevMessages, { content: newMessage, senderId: 'You' }]);
       setNewMessage("");
@@ -66,7 +64,7 @@ function ChatPage() {
 
   const handleUserSelect = (user) => {
     setSelectedUser(user);
-    setMessages(mockMessages[user.id]);
+    setMessages(mockMessages[user.username]);
   };
 
   return (

@@ -10,7 +10,8 @@ const app = express();
 const server = http.createServer(app);
 const PORT = 3001;
 
-mongoose.connect('mongodb+srv://Chatify:Chatify%40123@chatify.7ck5jpe.mongodb.net/Chatify').then(()=>{
+// mongoose.connect('mongodb://localhost:27017/Chatify').then(()=>{
+  mongoose.connect('mongodb+srv://Chatify:Chatify%40123@chatify.7ck5jpe.mongodb.net/Chatify').then(()=>{
   console.log('Mongodb Connected');
 }).catch(()=>{
   console.log('mongodb not connected ');

@@ -7,15 +7,21 @@ const userData = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
         required: true
     },
-
+    username: {
+        type: String,
+        required: true,
+        unique: true
+    }
+}, {
+    timestamps: true // This adds `createdAt` and `updatedAt` fields automatically
 });
-
 
 const User = mongoose.model("User", userData);
 

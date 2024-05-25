@@ -7,29 +7,32 @@ const User = require('../Model/UserSchema');
 //   });
 // };
 
+const generateUsername = (email) => {
+  // Remove non-alphanumeric characters and append a random number
+  const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  return `${baseUsername}${randomSuffix}`;
+};
+
 exports.signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  try {console.log(req.body);
-    const userExists = await User.findOne({ email });
+    // Generate username based on email
+    const username = generateUsername(email);
 
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const user = new User({ name, email, password });
-    await user.save()
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      // token: generateToken(user._id),
+    const newUser = new User({
+        name,
+        email,
+        password,
+        username // Set the generated username
     });
-  } catch (error) {
-    console.log(error);
+
+    await newUser.save();
+    res.status(201).json({ message: 'User created successfully', user: newUser });
+} catch (error) {
     res.status(500).json({ message: error.message });
-  }
+}
 };
 
 exports.login = async (req, res) => {
