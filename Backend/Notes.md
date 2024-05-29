@@ -1,5 +1,32 @@
 database Model Diagram
 
++-----------------------------------+
+|               Users               |
++-----------------------------------+
+| _id: ObjectId (PK)                |
+| username: String (Unique)         |
+| email: String (Unique)            |
+| contacts: []         |
+| password: String                  |
+| created_at: Date                  |
++-----------------------------------+
+
++-----------------------------------+
+|              Messages             |
++-----------------------------------+
+| _id: ObjectId (PK)                |
+| sender_id: ObjectId (FK to Users) |
+| recipient_id: ObjectId (FK to Users) |
+| content: String                   |
+| timestamp: Date                   |
++-----------------------------------+
+
+
+
+
+u1u2
+
+
 
 
 +-----------------------------------+

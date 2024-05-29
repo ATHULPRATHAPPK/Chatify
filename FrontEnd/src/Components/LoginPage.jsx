@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DarkModeToggle from './DarkModeToggle'; // Import the DarkModeToggle component
-import loginGif from '../assets/loginGif.gif'; // Import the GIF
-
+import DarkModeToggle from './DarkModeToggle';
+import loginGif from '../assets/loginGif.gif';
 const userURL = 'http://localhost:3001/api/users';
 
 const LoginPage = () => {
@@ -14,7 +13,6 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
@@ -32,12 +30,11 @@ const LoginPage = () => {
       const response = await axios.post(
         `${userURL}/${isLogin ? 'userlogin' : 'usersignup'}`,
         userData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      console.log('Data sent successfully:', response);
-
+      console.log(response);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('username',response.data.username)
       navigate('/UserProfilePage');
     } catch (error) {
       console.error('There was an error sending the data:', error);
@@ -55,7 +52,7 @@ const LoginPage = () => {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center dark:text-white">{isLogin ? 'Login' : 'Signup'} Page</h2>
           {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
-          <img src={loginGif} alt="Login Gif" className="bg-cover bg-center  mb-4 mx-auto" /> {/* Added GIF */}
+          <img src={loginGif} alt="Login Gif" className="bg-cover bg-center mb-4 mx-auto" />
           <form className="space-y-4" onSubmit={handleSubmit}>
             {!isLogin && (
               <div>
